@@ -1,7 +1,9 @@
 package tplink.router.ax1800;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -9,6 +11,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tplink.router.ax1800.driver.Chrome;
 import tplink.router.ax1800.driver.Wait;
@@ -18,8 +22,25 @@ import tplink.router.ax1800.page.StaticRouting;
 
 public class Setup {
 
+	private static final String STATIC_ROUTING_RULES_JSON = "static-routing-rules.json";
 	private static Logger logger;
 	private ResourceBundle i18n;
+
+	private Logger getLogger() {
+		if (null == logger) {
+			logger = LoggerFactory.getLogger(this.getClass());
+		}
+
+		return logger;
+	}
+
+	private ResourceBundle getI18n() {
+		if (null == i18n) {
+			i18n = ResourceBundle.getBundle("Messages");
+		}
+
+		return i18n;
+	}
 
 	public static void main(String[] args) {
 		Setup app = new Setup();
@@ -64,31 +85,25 @@ public class Setup {
 	private List<RoutingRule> getRoutingRulesFromConfigFile() {
 		List<RoutingRule> routingRules = new ArrayList<>();
 
-//		String netmask = "255.255.255.240";
-//		String gateway = "192.168.0.3";
-//		String interfaceValue = "LAN";
+		try (InputStream in = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(STATIC_ROUTING_RULES_JSON)) {
 
-//		routingRules.add(new RoutingRule("10.0.1.0", netmask, gateway, interfaceValue, "Network_Mgnt"));
-//		routingRules.add(new RoutingRule("10.0.3.0", netmask, gateway, interfaceValue, "Server_Mgnt"));
-//		routingRules.add(new RoutingRule("10.0.4.0", netmask, gateway, interfaceValue, "Server_Cluster_Mgnt"));
-//		routingRules.add(new RoutingRule("10.0.100.0", netmask, gateway, interfaceValue, "JumpServers"));
+			if (null == in) {
+				String errorMessage = String.format(getI18n().getString("static_routing_rules_file_not_found"),
+						STATIC_ROUTING_RULES_JSON);
+
+				throw new IllegalArgumentException(errorMessage);
+			}
+
+			final ObjectMapper mapper = new ObjectMapper();
+			RoutingRule[] jsonArray = mapper.readValue(in, RoutingRule[].class);
+
+			routingRules = Arrays.asList(jsonArray);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 		return routingRules;
-	}
-
-	private Logger getLogger() {
-		if (null == logger) {
-			logger = LoggerFactory.getLogger(this.getClass());
-		}
-
-		return logger;
-	}
-
-	private ResourceBundle getI18n() {
-		if (null == i18n) {
-			i18n = ResourceBundle.getBundle("Messages");
-		}
-
-		return i18n;
 	}
 
 }

@@ -4,39 +4,50 @@ import java.util.Objects;
 
 public class RoutingRule {
 
-	String target;
-	String netmask;
-	String gateway;
-	String interfaceName;
-	String description;
-
-	public RoutingRule(String target, String netmask, String gateway, String interfaceName, String description) {
-		super();
-		this.target = target;
-		this.netmask = netmask;
-		this.gateway = gateway;
-		this.interfaceName = interfaceName;
-		this.description = description;
-	}
+	private String target;
+	private String netmask;
+	private String gateway;
+	private String interfaceName;
+	private String description;
 
 	public String getTarget() {
 		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	public String getNetmask() {
 		return netmask;
 	}
 
+	public void setNetmask(String netmask) {
+		this.netmask = netmask;
+	}
+
 	public String getGateway() {
 		return gateway;
+	}
+
+	public void setGateway(String gateway) {
+		this.gateway = gateway;
 	}
 
 	public String getInterfaceName() {
 		return interfaceName;
 	}
 
+	public void setInterfaceName(String interfaceName) {
+		this.interfaceName = interfaceName;
+	}
+
 	public String getDescription() {
 		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override
