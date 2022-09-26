@@ -1,5 +1,7 @@
 package tplink.router.ax1800.page;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ResourceBundle;
 
 import org.openqa.selenium.By;
@@ -10,12 +12,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BasePage {
 
+	private static Logger logger;
 	private static ResourceBundle i18n;
 
-	private static final String URL = "https://tplinkwifi.net/";
+	private static final String URL = "";
 	private String url;
 
 	public BasePage() {
@@ -26,7 +30,7 @@ public abstract class BasePage {
 		setUrl(url);
 	}
 
-	private String getUrl() {
+	protected String getUrl() {
 		return url;
 	}
 
@@ -34,7 +38,13 @@ public abstract class BasePage {
 		this.url = url;
 	}
 
-	protected abstract Logger getLogger();
+	protected Logger getLogger() {
+		if (null == logger) {
+			logger = LoggerFactory.getLogger(this.getClass());
+		}
+
+		return logger;
+	}
 
 	protected ResourceBundle getI18n() {
 		if (null == i18n) {
@@ -50,7 +60,7 @@ public abstract class BasePage {
 	}
 
 	protected WebElement findElementByPath(WebDriverWait wait, String xpath) {
-		getLogger().info(getI18n().getString("searching_xpath"), xpath);
+		getLogger().debug(getI18n().getString("searching_xpath"), xpath);
 
 		return wait.until(driver -> driver.findElement(By.xpath(xpath)));
 	}
@@ -75,17 +85,16 @@ public abstract class BasePage {
 		wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public void goTo(WebDriver driver, WebDriverWait wait) {
-		goTo(driver, wait, getUrl());
+	public void goTo(WebDriver driver, WebDriverWait wait) throws URISyntaxException {
+		goTo(driver, wait, new URI(driver.getCurrentUrl()).resolve(getUrl()).toString());
 	}
 
-	public void goTo(WebDriver driver, WebDriverWait wait, String url) {
+	public void goTo(WebDriver driver, WebDriverWait wait, String url) throws URISyntaxException {
 		driver.navigate().to(url);
 
 		waitUntilPageIsFullyLoaded(wait);
 
 		getLogger().info(getI18n().getString("current_url"), driver.getCurrentUrl());
-		getLogger().info(getI18n().getString("current_title"), driver.getTitle());
 	}
 
 }
