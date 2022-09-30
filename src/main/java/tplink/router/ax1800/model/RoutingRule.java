@@ -10,6 +10,17 @@ public class RoutingRule {
 	private String interfaceName;
 	private String description;
 
+	public RoutingRule() {
+	}
+
+	public RoutingRule(String target, String netmask, String gateway, String interfaceName, String description) {
+		this.target = target;
+		this.netmask = netmask;
+		this.gateway = gateway;
+		this.interfaceName = interfaceName;
+		this.description = description;
+	}
+
 	public String getTarget() {
 		return target;
 	}

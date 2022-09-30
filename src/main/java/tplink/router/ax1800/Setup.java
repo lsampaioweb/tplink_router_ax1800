@@ -22,88 +22,89 @@ import tplink.router.ax1800.page.StaticRouting;
 
 public class Setup {
 
-	private static final String STATIC_ROUTING_RULES_JSON = "static-routing-rules.json";
-	private static Logger logger;
-	private ResourceBundle i18n;
+  private static final String STATIC_ROUTING_RULES_JSON = "static-routing-rules.json";
+  private static Logger logger;
+  private ResourceBundle i18n;
 
-	private Logger getLogger() {
-		if (null == logger) {
-			logger = LoggerFactory.getLogger(this.getClass());
-		}
+  public static void main(String[] args) {
+    Setup app = new Setup();
+    app.run();
+  }
 
-		return logger;
-	}
+  private void run() {
+    WebDriver driver = null;
 
-	private ResourceBundle getI18n() {
-		if (null == i18n) {
-			i18n = ResourceBundle.getBundle("Messages");
-		}
+    try {
+      getLogger().info(getI18n().getString("app_initializing"));
 
-		return i18n;
-	}
+      driver = new Chrome().getDriver();
 
-	public static void main(String[] args) {
-		Setup app = new Setup();
-		app.run();
-	}
+      WebDriverWait wait = new Wait().getDriver(driver);
 
-	private void run() {
-		WebDriver driver = null;
+      doLogin(driver, wait);
+      addStaticRoutings(driver, wait);
 
-		try {
-			getLogger().info(getI18n().getString("app_initializing"));
+    } catch (Exception e) {
+      getLogger().error(e.getLocalizedMessage());
+    } finally {
+      if (null != driver) {
+        driver.quit();
+      }
+    }
+    getLogger().info(getI18n().getString("app_finished"));
+  }
 
-			driver = new Chrome().getDriver();
+  private void doLogin(WebDriver driver, WebDriverWait wait) throws Exception {
+    Login page = new Login();
 
-			WebDriverWait wait = new Wait().getDriver(driver);
+    page.doLogin(driver, wait);
+  }
 
-			doLogin(driver, wait);
-			addStaticRoutings(driver, wait);
+  private void addStaticRoutings(WebDriver driver, WebDriverWait wait) throws URISyntaxException {
+    StaticRouting page = new StaticRouting();
 
-			getLogger().info(getI18n().getString("app_finished"));
-		} catch (Exception e) {
-			getLogger().error(e.getLocalizedMessage());
-		} finally {
-			if (null != driver) {
-				driver.quit();
-			}
-		}
-	}
+    page.addStaticRoutings(driver, wait, getRoutingRulesFromConfigFile());
+  }
 
-	private void doLogin(WebDriver driver, WebDriverWait wait) throws Exception {
-		Login page = new Login();
+  private List<RoutingRule> getRoutingRulesFromConfigFile() {
+    List<RoutingRule> routingRules = new ArrayList<>();
 
-		page.doLogin(driver, wait);
-	}
+    try (InputStream in = Thread.currentThread().getContextClassLoader()
+        .getResourceAsStream(STATIC_ROUTING_RULES_JSON)) {
 
-	private void addStaticRoutings(WebDriver driver, WebDriverWait wait) throws URISyntaxException {
-		StaticRouting page = new StaticRouting();
+      if (null == in) {
+        String errorMessage = String.format(getI18n().getString("static_routing_rules_file_not_found"),
+            STATIC_ROUTING_RULES_JSON);
 
-		page.addStaticRoutings(driver, wait, getRoutingRulesFromConfigFile());
-	}
+        throw new IllegalArgumentException(errorMessage);
+      }
 
-	private List<RoutingRule> getRoutingRulesFromConfigFile() {
-		List<RoutingRule> routingRules = new ArrayList<>();
+      final ObjectMapper mapper = new ObjectMapper();
+      RoutingRule[] jsonArray = mapper.readValue(in, RoutingRule[].class);
 
-		try (InputStream in = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(STATIC_ROUTING_RULES_JSON)) {
+      routingRules = Arrays.asList(jsonArray);
 
-			if (null == in) {
-				String errorMessage = String.format(getI18n().getString("static_routing_rules_file_not_found"),
-						STATIC_ROUTING_RULES_JSON);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
-				throw new IllegalArgumentException(errorMessage);
-			}
+    return routingRules;
+  }
 
-			final ObjectMapper mapper = new ObjectMapper();
-			RoutingRule[] jsonArray = mapper.readValue(in, RoutingRule[].class);
+  private Logger getLogger() {
+    if (null == logger) {
+      logger = LoggerFactory.getLogger(this.getClass());
+    }
 
-			routingRules = Arrays.asList(jsonArray);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+    return logger;
+  }
 
-		return routingRules;
-	}
+  private ResourceBundle getI18n() {
+    if (null == i18n) {
+      i18n = ResourceBundle.getBundle("Messages");
+    }
+
+    return i18n;
+  }
 
 }
