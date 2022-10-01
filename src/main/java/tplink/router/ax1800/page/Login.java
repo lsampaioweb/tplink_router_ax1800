@@ -7,8 +7,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import tplink.router.ax1800.credential.BaseCredentialManager;
-import tplink.router.ax1800.credential.LinuxCredentialManager;
-import tplink.router.ax1800.credential.MacOSXCredentialManager;
 
 public class Login extends BasePage {
 
@@ -31,7 +29,7 @@ public class Login extends BasePage {
     goTo(driver, wait);
 
     WebElement webElement = getPasswordInputElement(wait);
-    String password = getCredentialManager().getPassword(ROUTER_PASSWORD_ID);
+    String password = getPasswordFromCredentialManager(ROUTER_PASSWORD_ID);
 
     setInputValue(webElement, password);
     webElement.sendKeys(Keys.ENTER);
@@ -43,30 +41,10 @@ public class Login extends BasePage {
     return findElementByPath(wait, XPATH_ELEMENT_PASSWORD);
   }
 
-  private BaseCredentialManager getCredentialManager() throws Exception {
-    String os = getOperatingSystem();
+  private String getPasswordFromCredentialManager(String passwordID) throws Exception {
+    BaseCredentialManager credentialManager = BaseCredentialManager.getCredentialManager();
 
-    if (isMac(os)) {
-      return new MacOSXCredentialManager();
-    } else if (isUnix(os)) {
-      return new LinuxCredentialManager();
-    } else {
-      String errorMessage = String.format(getI18n().getString("operating_system_not_supported"), os);
-      throw new Exception(errorMessage);
-    }
-
-  }
-
-  private String getOperatingSystem() {
-    return System.getProperty("os.name").toLowerCase();
-  }
-
-  private boolean isMac(String os) {
-    return (os.indexOf("mac") >= 0);
-  }
-
-  private boolean isUnix(String os) {
-    return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0);
+    return credentialManager.getPassword(passwordID);
   }
 
 }

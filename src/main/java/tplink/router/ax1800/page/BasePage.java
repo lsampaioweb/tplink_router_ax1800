@@ -107,7 +107,9 @@ public abstract class BasePage {
   }
 
   public void goTo(WebDriver driver, WebDriverWait wait) throws URISyntaxException {
-    goTo(driver, wait, new URI(driver.getCurrentUrl()).resolve(getUrl()).toString());
+    URI uri = new URI(driver.getCurrentUrl()).resolve(getUrl());
+
+    goTo(driver, wait, uri.toString());
   }
 
   public void goTo(WebDriver driver, WebDriverWait wait, String url) throws URISyntaxException {

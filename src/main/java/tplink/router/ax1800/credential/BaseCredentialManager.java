@@ -9,49 +9,74 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BaseCredentialManager {
 
-	private static Logger logger;
-	private static ResourceBundle i18n;
+  private static Logger logger;
+  private static ResourceBundle i18n;
 
-	protected Logger getLogger() {
-		if (null == logger) {
-			logger = LoggerFactory.getLogger(this.getClass());
-		}
+  protected Logger getLogger() {
+    if (null == logger) {
+      logger = LoggerFactory.getLogger(this.getClass());
+    }
 
-		return logger;
-	}
+    return logger;
+  }
 
-	protected ResourceBundle getI18n() {
-		if (null == i18n) {
-			i18n = ResourceBundle.getBundle("Messages");
-		}
+  protected static ResourceBundle getI18n() {
+    if (null == i18n) {
+      i18n = ResourceBundle.getBundle("Messages");
+    }
 
-		return i18n;
-	}
+    return i18n;
+  }
 
-	public abstract String getPassword(String passwordID);
+  public static BaseCredentialManager getCredentialManager() throws Exception {
+    String os = getOperatingSystem();
 
-	protected String getPassword(String[] commands) {
-		try {
-			ProcessBuilder builder = new ProcessBuilder(commands);
-			builder.redirectErrorStream(true);
+    if (isMac(os)) {
+      return new MacOSXCredentialManager();
+    } else if (isUnix(os)) {
+      return new LinuxCredentialManager();
+    } else {
+      String errorMessage = String.format(getI18n().getString("operating_system_not_supported"), os);
+      throw new Exception(errorMessage);
+    }
+  }
 
-			Process process = builder.start();
+  private static String getOperatingSystem() {
+    return System.getProperty("os.name").toLowerCase();
+  }
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+  private static boolean isMac(String os) {
+    return (os.indexOf("mac") >= 0);
+  }
 
-			String password = reader.readLine();
+  private static boolean isUnix(String os) {
+    return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0);
+  }
 
-			int exitCode = process.waitFor();
-			if (0 != exitCode) {
-				String errorMessage = String.format(getI18n().getString("password_was_not_found"), exitCode);
-				throw new Exception(errorMessage);
-			}
+  public abstract String getPassword(String passwordID);
 
-			return password;
+  protected String getPassword(String[] commands) {
+    try {
+      ProcessBuilder builder = new ProcessBuilder(commands);
+      builder.redirectErrorStream(true);
 
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+      Process process = builder.start();
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+      String password = reader.readLine();
+
+      int exitCode = process.waitFor();
+      if (0 != exitCode) {
+        String errorMessage = String.format(getI18n().getString("password_was_not_found"), exitCode);
+        throw new Exception(errorMessage);
+      }
+
+      return password;
+
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
 
 }

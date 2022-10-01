@@ -67,21 +67,14 @@ public class StaticRouting extends BasePage {
     for (RoutingRule routingRule : routingRules) {
       List<RoutingRule> existingRoutingRules = getExistingRoutingRules(wait);
 
-      if (existingRoutingRules.isEmpty()) {
-        // 01 - It does not exist yet.
+      if ((existingRoutingRules.isEmpty()) || (!routingRuleIsInTheExistingList(routingRule, existingRoutingRules))) {
         addRoutingRule(driver, wait, routingRule);
       } else {
-        if (routingRuleIsInTheExistingList(routingRule, existingRoutingRules)) {
-          // 02 - This rule already exists.
-          editRoutingRule(driver, wait, routingRule, existingRoutingRules);
-        } else {
-          // 03 - There are other rules, but it is not this one.
-          addRoutingRule(driver, wait, routingRule);
-        }
+        editRoutingRule(driver, wait, routingRule, existingRoutingRules);
       }
     }
 
-    // 04 - There are rules that should be deleted.
+    // Verify if there are rules that should be deleted.
     List<RoutingRule> existingRoutingRules = getExistingRoutingRules(wait);
     List<RoutingRule> rulesTodelete = getExistingRulesThatShouldBeDeleted(existingRoutingRules, routingRules);
 
@@ -111,39 +104,13 @@ public class StaticRouting extends BasePage {
     return routingRules;
   }
 
-  private List<RoutingRule> getExistingRulesThatShouldBeDeleted(List<RoutingRule> existingRoutingRules,
-      List<RoutingRule> routingRules) {
-    List<RoutingRule> differences = new ArrayList<>(existingRoutingRules);
-
-    differences.removeAll(routingRules);
-
-    return differences;
-  }
-
-  private void deleteRoutingRules(WebDriver driver, WebDriverWait wait, List<RoutingRule> rulesTodelete)
-      throws URISyntaxException {
-    for (RoutingRule routingRule : rulesTodelete) {
-      List<WebElement> targetElements = getTargetElements(wait);
-
-      for (int i = 0; i < targetElements.size(); i++) {
-        WebElement currentElement = targetElements.get(i);
-
-        if (routingRule.getTarget().equals(currentElement.getAttribute("textContent"))) {
-
-          navigateToTheRightPage(wait, i + 1);
-
-          elementClick(getDeleteButtonElementAtIndex(wait, i + 1));
-
-          wait.until(ExpectedConditions.stalenessOf(currentElement));
-
-          goTo(driver, wait);
-
-          getLogger().info(getI18n().getString("deleted_rule"), routingRule);
-
-          break;
-        }
+  private boolean routingRuleIsInTheExistingList(RoutingRule routingRule, List<RoutingRule> existingRoutingRules) {
+    for (RoutingRule currentRoutingRule : existingRoutingRules) {
+      if (currentRoutingRule.equals(routingRule)) {
+        return true;
       }
     }
+    return false;
   }
 
   private void extractRoutingRulesFromHtml(WebDriverWait wait, List<RoutingRule> routingRules) {
@@ -197,15 +164,6 @@ public class StaticRouting extends BasePage {
     }
   }
 
-  private boolean routingRuleIsInTheExistingList(RoutingRule routingRule, List<RoutingRule> existingRoutingRules) {
-    for (RoutingRule currentRoutingRule : existingRoutingRules) {
-      if (currentRoutingRule.equals(routingRule)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private void editRoutingRule(WebDriver driver, WebDriverWait wait, RoutingRule routingRule,
       List<RoutingRule> existingRoutingRules) throws URISyntaxException {
     try {
@@ -235,7 +193,6 @@ public class StaticRouting extends BasePage {
           }
 
           if (anyValueChanged(netmaskChanged, gatewayChanged, interfaceNameChanged, descriptionChanged)) {
-
             navigateToTheRightPage(wait, i + 1);
 
             elementClick(getEditButtonElementAtIndex(wait, i + 1));
@@ -290,6 +247,81 @@ public class StaticRouting extends BasePage {
       elementClick(pagingElements.get(pageToGo));
 
       waitUntilPageIsFullyLoaded(wait);
+    }
+  }
+
+  private List<RoutingRule> getExistingRulesThatShouldBeDeleted(List<RoutingRule> existingRoutingRules,
+      List<RoutingRule> routingRules) {
+    List<RoutingRule> differences = new ArrayList<>(existingRoutingRules);
+
+    differences.removeAll(routingRules);
+
+    return differences;
+  }
+
+  private void deleteRoutingRules(WebDriver driver, WebDriverWait wait, List<RoutingRule> rulesTodelete)
+      throws URISyntaxException {
+    for (RoutingRule routingRule : rulesTodelete) {
+      List<WebElement> targetElements = getTargetElements(wait);
+
+      for (int i = 0; i < targetElements.size(); i++) {
+        WebElement currentElement = targetElements.get(i);
+
+        if (routingRule.getTarget().equals(currentElement.getAttribute("textContent"))) {
+
+          navigateToTheRightPage(wait, i + 1);
+
+          elementClick(getDeleteButtonElementAtIndex(wait, i + 1));
+
+          wait.until(ExpectedConditions.stalenessOf(currentElement));
+
+          goTo(driver, wait);
+
+          getLogger().info(getI18n().getString("deleted_rule"), routingRule);
+
+          break;
+        }
+      }
+    }
+  }
+
+  private void setTargetValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
+    setInputValue(getTargetInputElement(wait), routingRule.getTarget());
+
+    throwExceptionIfAnyErrorMessageWasFound(getTargetErrorMessageElement(wait), routingRule.getTarget());
+  }
+
+  private void setNetmaskValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
+    setInputValue(getNetmaskInputElement(wait), routingRule.getNetmask());
+
+    throwExceptionIfAnyErrorMessageWasFound(getNetmaskErrorMessageElement(wait), routingRule.getNetmask());
+  }
+
+  private void setGatewayValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
+    setInputValue(getGatewayInputElement(wait), routingRule.getGateway());
+
+    throwExceptionIfAnyErrorMessageWasFound(getGatewayErrorMessageElement(wait), routingRule.getGateway());
+  }
+
+  private void setInterfaceNameValue(WebDriverWait wait, RoutingRule routingRule) {
+    elementClick(getInterfaceNameComboboxElement(wait));
+
+    elementClick(getInterfaceNameSpanElement(wait, routingRule));
+  }
+
+  private void setDescriptionValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
+    setInputValue(getDescriptionInputElement(wait), routingRule.getDescription());
+
+    throwExceptionIfAnyErrorMessageWasFound(getDescriptionErrorMessageElement(wait), routingRule.getDescription());
+  }
+
+  private void throwExceptionIfAnyErrorMessageWasFound(WebElement errorMessageElement, String attributeValue)
+      throws AttributeInUseException {
+    if (!errorMessageElement.getText().isBlank()) {
+      String errorMessage = String.format(getI18n().getString("error_message_found"), attributeValue,
+          errorMessageElement.getText());
+
+      throw new AttributeInUseException(errorMessage);
     }
   }
 
@@ -377,46 +409,6 @@ public class StaticRouting extends BasePage {
 
   private WebElement getDeleteButtonElementAtIndex(WebDriverWait wait, int index) {
     return findElementByPath(wait, String.format(XPATH_BUTTON_DELETE, index));
-  }
-
-  private void setTargetValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
-    setInputValue(getTargetInputElement(wait), routingRule.getTarget());
-
-    throwExceptionIfAnyErrorMessageWasFound(getTargetErrorMessageElement(wait), routingRule.getTarget());
-  }
-
-  private void setNetmaskValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
-    setInputValue(getNetmaskInputElement(wait), routingRule.getNetmask());
-
-    throwExceptionIfAnyErrorMessageWasFound(getNetmaskErrorMessageElement(wait), routingRule.getNetmask());
-  }
-
-  private void setGatewayValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
-    setInputValue(getGatewayInputElement(wait), routingRule.getGateway());
-
-    throwExceptionIfAnyErrorMessageWasFound(getGatewayErrorMessageElement(wait), routingRule.getGateway());
-  }
-
-  private void setInterfaceNameValue(WebDriverWait wait, RoutingRule routingRule) {
-    elementClick(getInterfaceNameComboboxElement(wait));
-
-    elementClick(getInterfaceNameSpanElement(wait, routingRule));
-  }
-
-  private void setDescriptionValue(WebDriverWait wait, RoutingRule routingRule) throws AttributeInUseException {
-    setInputValue(getDescriptionInputElement(wait), routingRule.getDescription());
-
-    throwExceptionIfAnyErrorMessageWasFound(getDescriptionErrorMessageElement(wait), routingRule.getDescription());
-  }
-
-  private void throwExceptionIfAnyErrorMessageWasFound(WebElement errorMessageElement, String attributeValue)
-      throws AttributeInUseException {
-    if (!errorMessageElement.getText().isBlank()) {
-      String errorMessage = String.format(getI18n().getString("error_message_found"), attributeValue,
-          errorMessageElement.getText());
-
-      throw new AttributeInUseException(errorMessage);
-    }
   }
 
 }

@@ -51,6 +51,7 @@ public class Setup {
         driver.quit();
       }
     }
+
     getLogger().info(getI18n().getString("app_finished"));
   }
 
