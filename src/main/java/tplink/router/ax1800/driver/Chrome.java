@@ -10,7 +10,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Chrome {
 
 	private static final int WAIT_SECONDS = 5;
-	private static final boolean HEADLESS = false;
+	private static final boolean HEADLESS = true;
 	private static final String[] ARGUMENTS = { "ignore-certificate-errors" };
 	private int waitSeconds;
 	private boolean headless;
