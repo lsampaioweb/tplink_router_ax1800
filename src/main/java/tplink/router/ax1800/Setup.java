@@ -18,6 +18,7 @@ import tplink.router.ax1800.driver.Chrome;
 import tplink.router.ax1800.driver.Wait;
 import tplink.router.ax1800.model.RoutingRule;
 import tplink.router.ax1800.page.Login;
+import tplink.router.ax1800.page.Logout;
 import tplink.router.ax1800.page.StaticRouting;
 
 public class Setup {
@@ -43,6 +44,7 @@ public class Setup {
 
       doLogin(driver, wait);
       addStaticRoutings(driver, wait);
+      doLogout(driver, wait);
 
     } catch (Exception e) {
       getLogger().error(e.getLocalizedMessage());
@@ -90,6 +92,12 @@ public class Setup {
     }
 
     return routingRules;
+  }
+
+  private void doLogout(WebDriver driver, WebDriverWait wait) throws Exception {
+    Logout page = new Logout();
+
+    page.doLogout(driver, wait);
   }
 
   private Logger getLogger() {

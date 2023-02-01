@@ -11,7 +11,7 @@ public class Chrome {
 
 	private static final int WAIT_SECONDS = 5;
 	private static final boolean HEADLESS = true;
-	private static final String[] ARGUMENTS = { "ignore-certificate-errors" };
+	private static final String[] ARGUMENTS = { "--ignore-certificate-errors", "--no-sandbox", "--disable-extensions" };
 	private int waitSeconds;
 	private boolean headless;
 	private String[] arguments;

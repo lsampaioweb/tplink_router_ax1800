@@ -10,7 +10,7 @@ import tplink.router.ax1800.credential.BaseCredentialManager;
 
 public class Login extends BasePage {
 
-  private static final String URL = "https://tplinkwifi.net/";
+  private static final String URL = "https://192.168.0.2/";
 
   private static final String ROUTER_PASSWORD_ID = "TP-Link-AX20";
 

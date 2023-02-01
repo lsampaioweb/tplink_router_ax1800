@@ -21,6 +21,7 @@ Run the command in the terminal:
 # Compile the application
 Run the command in the terminal:
 ```bash
+  cd git/datacenter/projects/tplink_router_ax1800
   mvn package
 ```
 
@@ -28,6 +29,7 @@ Run the command in the terminal:
 Run the command in the terminal:
 ```bash
   java -cp target/tplink.router.ax1800-0.0.1-SNAPSHOT-jar-with-dependencies.jar tplink.router.ax1800.Setup
+  java -jar tplink.router.ax1800.Setup
   or 
   java -jar target/tplink.router.ax1800-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 ```
