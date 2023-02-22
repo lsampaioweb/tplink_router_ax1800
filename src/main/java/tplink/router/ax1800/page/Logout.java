@@ -1,12 +1,9 @@
 package tplink.router.ax1800.page;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import tplink.router.ax1800.credential.BaseCredentialManager;
 
 public class Logout extends BasePage {
 

@@ -10,19 +10,16 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Chrome {
 
 	private static final int WAIT_SECONDS = 5;
-	private static final boolean HEADLESS = true;
-	private static final String[] ARGUMENTS = { "--ignore-certificate-errors", "--no-sandbox", "--disable-extensions" };
+	private static final String[] ARGUMENTS = { "--ignore-certificate-errors", "--no-sandbox", "--headless", "--window-size=1920x1080", "--start-maximized" };
 	private int waitSeconds;
-	private boolean headless;
 	private String[] arguments;
 
 	public Chrome() {
-		this(WAIT_SECONDS, HEADLESS, ARGUMENTS);
+		this(WAIT_SECONDS, ARGUMENTS);
 	}
 
-	public Chrome(int waitSeconds, boolean headless, String[] arguments) {
+	public Chrome(int waitSeconds, String[] arguments) {
 		setWaitSeconds(waitSeconds);
-		setHeadless(headless);
 		setArguments(arguments);
 	}
 
@@ -32,7 +29,6 @@ public class Chrome {
 		ChromeDriver driver = new ChromeDriver(getDefaultOptions());
 
 		driver.manage().timeouts().implicitlyWait(getWaitDurationSeconds());
-		driver.manage().window().maximize();
 
 		return driver;
 	}
@@ -44,7 +40,6 @@ public class Chrome {
 	private ChromeOptions getDefaultOptions() {
 		ChromeOptions options = new ChromeOptions();
 
-		options.setHeadless(isHeadless());
 		options.addArguments(getArguments());
 
 		return options;
@@ -60,14 +55,6 @@ public class Chrome {
 
 	private void setWaitSeconds(int waitSeconds) {
 		this.waitSeconds = waitSeconds;
-	}
-
-	private boolean isHeadless() {
-		return headless;
-	}
-
-	private void setHeadless(boolean headless) {
-		this.headless = headless;
 	}
 
 	private String[] getArguments() {

@@ -3,16 +3,21 @@
   <groupId>homelab.datacenter</groupId>
   <artifactId>tplink.router.ax1800</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>11</maven.compiler.release>
+    <slf4j-simple.version>2.0.0</slf4j-simple.version>
+    <selenium.version>4.8.0</selenium.version>
+    <webdrivermanager.version>5.3.2</webdrivermanager.version>
+    <jackson.version>2.13.4</jackson.version>
+  </properties>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.10.1</version>
-        <configuration>
-          <source>18</source>
-          <target>18</target>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -38,14 +43,6 @@
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <slf4j-simple.version>2.0.0</slf4j-simple.version>
-    <selenium.version>4.8.0</selenium.version>
-    <webdrivermanager.version>5.3.2</webdrivermanager.version>
-    <jackson.version>2.13.4</jackson.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
