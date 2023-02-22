@@ -69,13 +69,13 @@ public abstract class BasePage {
   }
 
   protected WebElement findElementByPath(WebDriverWait wait, String xpath) {
-    getLogger().info(getI18n().getString("searching_xpath"), xpath);
+    getLogger().debug(getI18n().getString("searching_xpath"), xpath);
 
     return wait.until(driver -> driver.findElement(By.xpath(xpath)));
   }
 
   protected List<WebElement> findElementsByPath(WebDriverWait wait, String xpath) {
-    getLogger().info(getI18n().getString("searching_xpath"), xpath);
+    getLogger().debug(getI18n().getString("searching_xpath"), xpath);
 
     List<WebElement> webElements = wait.until(driver -> driver.findElements(By.xpath(xpath)));
 

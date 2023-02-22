@@ -133,7 +133,10 @@ public class StaticRouting extends BasePage {
           String interfaceName = interfaceElements.get(i).getText();
           String description = descriptionElements.get(i).getText();
 
-          routingRules.add(new RoutingRule(target, netmask, gateway, interfaceName, description));
+          RoutingRule foundRule = new RoutingRule(target, netmask, gateway, interfaceName, description);
+          routingRules.add(foundRule);
+
+          getLogger().info(getI18n().getString("found_rule"), foundRule);
         }
       }
     }
@@ -141,6 +144,8 @@ public class StaticRouting extends BasePage {
 
   private void addRoutingRule(WebDriver driver, WebDriverWait wait, RoutingRule routingRule) throws URISyntaxException {
     try {
+      getLogger().info(getI18n().getString("adding_rule"), routingRule);
+
       elementClick(getAddButtonElement(wait));
 
       setTargetValue(wait, routingRule);
@@ -155,6 +160,8 @@ public class StaticRouting extends BasePage {
 
       elementClick(getSaveButtonElement(wait));
 
+      getLogger().info(getI18n().getString("added_rule"), routingRule);
+
       goTo(driver, wait);
 
     } catch (Exception e) {
@@ -167,6 +174,8 @@ public class StaticRouting extends BasePage {
   private void editRoutingRule(WebDriver driver, WebDriverWait wait, RoutingRule routingRule,
       List<RoutingRule> existingRoutingRules) throws URISyntaxException {
     try {
+      getLogger().info(getI18n().getString("editing_rule"), routingRule);
+
       for (int i = 0; i < existingRoutingRules.size(); i++) {
         RoutingRule currentRule = existingRoutingRules.get(i);
 
@@ -211,6 +220,8 @@ public class StaticRouting extends BasePage {
             }
 
             elementClick(getSaveButtonElement(wait));
+
+            getLogger().info(getI18n().getString("edited_rule"), routingRule);
 
             goTo(driver, wait);
           }
@@ -262,6 +273,8 @@ public class StaticRouting extends BasePage {
   private void deleteRoutingRules(WebDriver driver, WebDriverWait wait, List<RoutingRule> rulesTodelete)
       throws URISyntaxException {
     for (RoutingRule routingRule : rulesTodelete) {
+      getLogger().info(getI18n().getString("deleting_rule"), routingRule);
+
       List<WebElement> targetElements = getTargetElements(wait);
 
       for (int i = 0; i < targetElements.size(); i++) {
@@ -276,7 +289,7 @@ public class StaticRouting extends BasePage {
           wait.until(ExpectedConditions.stalenessOf(currentElement));
 
           goTo(driver, wait);
-
+          
           getLogger().info(getI18n().getString("deleted_rule"), routingRule);
 
           break;

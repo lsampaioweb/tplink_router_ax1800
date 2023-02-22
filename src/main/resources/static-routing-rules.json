@@ -1,28 +1,28 @@
 [
 	{
 		"target": "10.0.100.0",
-		"netmask": "255.255.255.240",
+		"netmask": "255.255.255.224",
 		"gateway": "192.168.0.4",
 		"interfaceName": "LAN",
 		"description": "Jump-Server"
 	},
 	{
 		"target": "10.0.5.0",
-		"netmask": "255.255.255.240",
+		"netmask": "255.255.255.224",
 		"gateway": "192.168.0.4",
 		"interfaceName": "LAN",
-		"description": "Load-Balancing"
+		"description": "Backup"
 	},
 	{
 		"target": "10.0.4.0",
-		"netmask": "255.255.255.240",
+		"netmask": "255.255.255.224",
 		"gateway": "192.168.0.4",
 		"interfaceName": "LAN",
-		"description": "Vms-Infra"
+		"description": "Infra"
 	},
 	{
 		"target": "10.0.2.0",
-		"netmask": "255.255.255.240",
+		"netmask": "255.255.255.224",
 		"gateway": "10.0.2.4",
 		"interfaceName": "LAN",
 		"description": "Lan-Management"
